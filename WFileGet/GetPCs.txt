@@ -1,0 +1,16 @@
+// To get all computers in network run this Java code:
+
+public static String[] getAllPCs() {
+	Process proc = Runtime.getRuntime().exec("net view");
+	String s = "";
+	new Thread(() -> {
+		try {
+			BufferedInputStream bis = new BufferedInputStream(proc.getInputStream());
+			int c;
+			while ((c = bis.read()) != -1) s += String.valueOf((char) c);
+		} catch (IOException e) {
+			System.err.println(e);
+		}
+	}).start();
+	return s;
+}
