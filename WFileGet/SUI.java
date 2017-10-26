@@ -116,13 +116,42 @@ public class SUI extends JFrame {
 		pack();
 		setVisible(true);
 	}
-
+	private char[] conv(Character[] arr) {
+		char[] array = new char[arr.length];
+		for (int i = 0; i < arr.length; i ++)
+			array[i] = arr[i];
+		return array;
+	}
+	
 	public void downloadFile(ActionEvent e) {
 		int row_ind = files.getSelectedRow();
 		if (row_ind != -1) {
 			Vector row = ((Vector)((DefaultTableModel) files.getModel()).getDataVector().elementAt(row_ind));
 			String compIp = getComputerIp((String)row.elementAt(0));
 			System.out.println(compIp);
+			try {
+				Socket sock = new Socket(compIp, 9090);
+				try {
+					InputStream is = sock.getInputStream();
+					OutputStream os = sock.getOutputStream();
+					try {
+						String fileName = (String) row.elementAt(1);
+						os.write("FILE: ".getBytes());
+						os.write(fileName);
+						ArrayList<Character> list = new ArrayList<>();
+						int c;
+						while ((c = is.read()) != -1) list.add((char) c);
+						String fileData = new String(conv(list.toArray(new Character[list.size()])));
+						try {
+							saveFile(fileName, fileData);
+						} catch (IOException e) {}
+					} catch (Exception e) {}
+				} catch (Exception e) {
+					
+				}
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(null, "Error: exception occured")
+			}
 		}
 	}
 // All shared files MUST be in folder named 'shared' and this folder
